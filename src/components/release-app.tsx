@@ -8,16 +8,31 @@ import { ReleaseDetail } from "./release-detail";
 import { ReleaseForm } from "./release-form";
 import { ReleaseList } from "./release-list";
 
+const PAGE_SIZE = 20;
+
 type View = { name: "list" } | { name: "new" } | { name: "detail"; id: string };
+type Page = { items: ReleaseView[]; total: number; hasMore: boolean };
 
 export function ReleaseApp() {
-  const { data, loading, error } = useQuery<{ releases: ReleaseView[] }>(RELEASES);
+  const { data, loading, error, fetchMore } = useQuery<{ releases: Page }>(RELEASES, {
+    variables: { limit: PAGE_SIZE, offset: 0 },
+  });
   const [view, setView] = useState<View>({ name: "list" });
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const releases = data?.releases ?? [];
+  const releases = data?.releases.items ?? [];
   const toList = () => setView({ name: "list" });
   const selected =
     view.name === "detail" ? releases.find((r) => r.id === view.id) : undefined;
+
+  async function loadMore() {
+    setLoadingMore(true);
+    try {
+      await fetchMore({ variables: { limit: PAGE_SIZE, offset: releases.length } });
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   return (
     <main className="container">
@@ -38,6 +53,10 @@ export function ReleaseApp() {
       {(view.name === "list" || (view.name === "detail" && !selected)) && (
         <ReleaseList
           releases={releases}
+          total={data?.releases.total ?? 0}
+          hasMore={data?.releases.hasMore ?? false}
+          loadingMore={loadingMore}
+          onLoadMore={loadMore}
           loading={loading}
           error={error?.message}
           onView={(id) => setView({ name: "detail", id })}

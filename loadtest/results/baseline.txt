@@ -1,0 +1,149 @@
+﻿k6 : time="2026-10-25T16:28:43+05:30" level=warning msg="Request Failed" error="request timeout"
+At line:1 char:499
++ ... op\Cactro"; k6 run -e URL=https://cactro-test-iota.vercel.app --summa ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (time="2026-10-2...equest timeout":String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+time="2026-10-25T16:28:56+05:30" level=warning msg="Request Failed" error="request timeout"
+time="2026-10-25T16:28:58+05:30" level=warning msg="Request Failed" error="request timeout"
+time="2026-10-25T16:29:00+05:30" level=warning msg="Request Failed" error="request timeout"
+time="2026-10-25T16:29:10+05:30" level=warning msg="Request Failed" error="request timeout"
+time="2026-10-25T16:29:13+05:30" level=warning msg="Request Failed" error="request timeout"
+time="2026-10-25T16:29:13+05:30" level=warning msg="Request Failed" error="request timeout"
+
+
+  █ THRESHOLDS 
+
+    graphql_errors{stage:vu10}
+    ✓ 'rate<0.01' rate=0.00%
+
+    graphql_errors{stage:vu100}
+    ✓ 'rate<0.01' rate=0.00%
+
+    graphql_errors{stage:vu200}
+    ✓ 'rate<0.01' rate=0.20%
+
+    graphql_errors{stage:vu25}
+    ✓ 'rate<0.01' rate=0.00%
+
+    graphql_errors{stage:vu400}
+    ✓ 'rate<0.01' rate=0.58%
+
+    graphql_errors{stage:vu50}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_req_duration{stage:vu10}
+    ✓ 'p(95)<1000' p(95)=756.58ms
+
+    http_req_duration{stage:vu100}
+    ✗ 'p(95)<1000' p(95)=9.64s
+
+    http_req_duration{stage:vu200}
+    ✗ 'p(95)<1000' p(95)=16.88s
+
+    http_req_duration{stage:vu25}
+    ✗ 'p(95)<1000' p(95)=2.51s
+
+    http_req_duration{stage:vu400}
+    ✗ 'p(95)<1000' p(95)=22.28s
+
+    http_req_duration{stage:vu50}
+    ✗ 'p(95)<1000' p(95)=4.78s
+
+    http_req_failed{stage:vu10}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_req_failed{stage:vu100}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_req_failed{stage:vu200}
+    ✓ 'rate<0.01' rate=0.20%
+
+    http_req_failed{stage:vu25}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_req_failed{stage:vu400}
+    ✓ 'rate<0.01' rate=0.58%
+
+    http_req_failed{stage:vu50}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_reqs{stage:vu10}
+    ✓ 'count>=0' count=429
+
+    http_reqs{stage:vu100}
+    ✓ 'count>=0' count=476
+
+    http_reqs{stage:vu200}
+    ✓ 'count>=0' count=499
+
+    http_reqs{stage:vu25}
+    ✓ 'count>=0' count=458
+
+    http_reqs{stage:vu400}
+    ✓ 'count>=0' count=509
+
+    http_reqs{stage:vu50}
+    ✓ 'count>=0' count=504
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 7842   38.786674/s
+    checks_succeeded...: 99.82% 7828 out of 7842
+    checks_failed......: 0.17%  14 out of 7842
+
+    ✗ status 200
+      ↳  99% — ✓ 3914 / ✗ 7
+    ✗ no graphql errors
+      ↳  99% — ✓ 3914 / ✗ 7
+
+    CUSTOM
+    graphql_errors.................: 0.17%  7 out of 3921
+      { stage:vu10 }...............: 0.00%  0 out of 429
+      { stage:vu100 }..............: 0.00%  0 out of 476
+      { stage:vu200 }..............: 0.20%  1 out of 499
+      { stage:vu25 }...............: 0.00%  0 out of 458
+      { stage:vu400 }..............: 0.58%  3 out of 509
+      { stage:vu50 }...............: 0.00%  0 out of 504
+
+    HTTP
+    http_req_duration..............: avg=7.07s    min=296.92ms med=4.85s    max=30s      p(90)=17.1s    p(95)=18.72s  
+      { expected_response:true }...: avg=7.03s    min=296.92ms med=4.84s    max=27.67s   p(90)=17.04s   p(95)=18.68s  
+      { stage:vu10 }...............: avg=580.16ms min=299.54ms med=607.48ms max=861.13ms p(90)=738.32ms p(95)=756.58ms
+      { stage:vu100 }..............: avg=5.51s    min=1.34s    med=5.26s    max=14.57s   p(90)=8.48s    p(95)=9.64s   
+      { stage:vu200 }..............: avg=10.82s   min=2.04s    med=10.83s   max=30s      p(90)=15.84s   p(95)=16.88s  
+      { stage:vu25 }...............: avg=1.36s    min=530.1ms  med=1.26s    max=5.62s    p(90)=2s       p(95)=2.51s   
+      { stage:vu400 }..............: avg=16.69s   min=5.41s    med=16.87s   max=30s      p(90)=20.35s   p(95)=22.28s  
+      { stage:vu50 }...............: avg=2.56s    min=790.69ms med=2.31s    max=8.3s     p(90)=4.13s    p(95)=4.78s   
+    http_req_failed................: 0.17%  7 out of 3921
+      { stage:vu10 }...............: 0.00%  0 out of 429
+      { stage:vu100 }..............: 0.00%  0 out of 476
+      { stage:vu200 }..............: 0.20%  1 out of 499
+      { stage:vu25 }...............: 0.00%  0 out of 458
+      { stage:vu400 }..............: 0.58%  3 out of 509
+      { stage:vu50 }...............: 0.00%  0 out of 504
+    http_reqs......................: 3921   19.393337/s
+      { stage:vu10 }...............: 429    2.121842/s
+      { stage:vu100 }..............: 476    2.354305/s
+      { stage:vu200 }..............: 499    2.468063/s
+      { stage:vu25 }...............: 458    2.265276/s
+      { stage:vu400 }..............: 509    2.517523/s
+      { stage:vu50 }...............: 504    2.492793/s
+
+    EXECUTION
+    iteration_duration.............: avg=7.09s    min=297.87ms med=4.86s    max=30s      p(90)=17.14s   p(95)=18.8s   
+    iterations.....................: 3921   19.393337/s
+    vus............................: 1      min=1         max=400
+    vus_max........................: 400    min=400       max=400
+
+    NETWORK
+    data_received..................: 2.4 GB 12 MB/s
+    data_sent......................: 6.6 MB 33 kB/s
+
+
+
+time="2026-10-25T16:29:18+05:30" level=error msg="thresholds on metrics 'http_req_duration{stage:vu100}, 
+http_req_duration{stage:vu200}, http_req_duration{stage:vu25}, http_req_duration{stage:vu400}, 
+http_req_duration{stage:vu50}' have been crossed"

@@ -14,7 +14,9 @@ let seq = 0;
 vi.mock("../src/lib/db", () => ({
   prisma: {
     release: {
-      findMany: async () => [...rows.values()],
+      findMany: async ({ skip = 0, take }: { skip?: number; take?: number } = {}) =>
+        [...rows.values()].slice(skip, take === undefined ? undefined : skip + take),
+      count: async () => rows.size,
       findUnique: async ({ where }: { where: { id: string } }) =>
         rows.get(where.id) ?? null,
       create: async ({ data }: { data: Omit<Row, "id" | "completedSteps"> }) => {
@@ -103,7 +105,35 @@ describe("release API", () => {
 
     const del = await run(`mutation { deleteRelease(id: "${rel.id}") }`);
     expect(del.data!.deleteRelease).toBe(true);
-    expect((await run(`{ releases { id } }`)).data!.releases).toEqual([]);
+    expect((await run(`{ releases { items { id } total } }`)).data!.releases).toEqual({
+      items: [],
+      total: 0,
+    });
+  });
+
+  it("paginates with limit/offset", async () => {
+    for (let i = 0; i < 5; i++) {
+      await run(
+        `mutation { createRelease(name: "r${i}", dueDate: "2026-12-0${i + 1}T10:00:00Z") { id } }`,
+      );
+    }
+    const page = async (args: string) =>
+      (await run(`{ releases${args} { items { name } total hasMore } }`)).data!
+        .releases as { items: { name: string }[]; total: number; hasMore: boolean };
+
+    const first = await page("(limit: 2, offset: 0)");
+    expect(first.items.map((r) => r.name)).toEqual(["r0", "r1"]);
+    expect(first.total).toBe(5);
+    expect(first.hasMore).toBe(true);
+
+    const last = await page("(limit: 2, offset: 4)");
+    expect(last.items.map((r) => r.name)).toEqual(["r4"]);
+    expect(last.hasMore).toBe(false);
+
+    // default page size is 20, so everything fits and nothing is "more"
+    const all = await page("");
+    expect(all.items).toHaveLength(5);
+    expect(all.hasMore).toBe(false);
   });
 
   it("rejects bad input", async () => {

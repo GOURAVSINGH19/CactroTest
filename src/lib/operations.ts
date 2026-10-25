@@ -16,9 +16,13 @@ export const RELEASE_FIELDS = gql`
 `;
 
 export const RELEASES = gql`
-  query Releases {
-    releases {
-      ...ReleaseFields
+  query Releases($limit: Int, $offset: Int) {
+    releases(limit: $limit, offset: $offset) {
+      items {
+        ...ReleaseFields
+      }
+      total
+      hasMore
     }
   }
   ${RELEASE_FIELDS}

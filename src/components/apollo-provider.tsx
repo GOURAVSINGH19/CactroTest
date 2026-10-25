@@ -9,10 +9,25 @@ export function Providers({ children }: { children: ReactNode }) {
     () =>
       new ApolloClient({
         link: new HttpLink({ uri: "/api/graphql" }),
-        // Step ids (1..7) repeat across releases, so steps must not be cached
-        // as shared `Step:<id>` entities; keep them embedded in their release.
         cache: new InMemoryCache({
-          typePolicies: { Step: { keyFields: false } },
+          typePolicies: {
+            Step: { keyFields: false },
+            Query: {
+              fields: {
+                releases: {
+                  keyArgs: false, // all pages live under one cached list
+                  merge(existing, incoming, { args }) {
+                    const offset = args?.offset ?? 0;
+                    // offset 0 = fresh load or refetch after create/delete: replace
+                    const prev: unknown[] = existing?.items ?? [];
+                    const items =
+                      offset === 0 ? incoming.items : [...prev.slice(0, offset), ...incoming.items];
+                    return { ...incoming, items };
+                  },
+                },
+              },
+            },
+          },
         }),
       }),
   );

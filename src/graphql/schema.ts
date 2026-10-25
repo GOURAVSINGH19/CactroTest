@@ -20,8 +20,14 @@ export const typeDefs = /* GraphQL */ `
     steps: [Step!]!
   }
 
+  type ReleasePage {
+    items: [Release!]!
+    total: Int!
+    hasMore: Boolean!
+  }
+
   type Query {
-    releases: [Release!]!
+    releases(limit: Int = 20, offset: Int = 0): ReleasePage!
     release(id: ID!): Release
   }
 

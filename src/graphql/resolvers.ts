@@ -11,6 +11,9 @@ interface ReleaseRow {
   completedSteps: number[];
 }
 
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100; // clients cannot ask for the whole table
+
 const notFound = (id: string) =>
   new GraphQLError(`Release ${id} not found`, {
     extensions: { code: "NOT_FOUND" },
@@ -21,7 +24,23 @@ const badInput = (msg: string) =>
 
 export const resolvers = {
   Query: {
-    releases: () => prisma.release.findMany({ orderBy: { dueDate: "asc" } }),
+    // Offset pagination. `id` is a tiebreaker so equal dueDates keep a stable order.
+    releases: async (
+      _: unknown,
+      args: { limit?: number | null; offset?: number | null },
+    ) => {
+      const take = Math.min(Math.max(args.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
+      const skip = Math.max(args.offset ?? 0, 0);
+      const [items, total] = await Promise.all([
+        prisma.release.findMany({
+          orderBy: [{ dueDate: "asc" }, { id: "asc" }],
+          skip,
+          take,
+        }),
+        prisma.release.count(),
+      ]);
+      return { items, total, hasMore: skip + items.length < total };
+    },
     release: (_: unknown, { id }: { id: string }) =>
       prisma.release.findUnique({ where: { id } }),
   },

@@ -62,7 +62,7 @@ One endpoint: **`POST /api/graphql`** (GraphQL). `GET /api/graphql` serves the G
 
 | Operation | Description |
 |---|---|
-| `releases` | All releases, ordered by due date ascending |
+| `releases(limit: Int = 20, offset: Int = 0)` | A page of releases ordered by due date (then id). Returns `{ items, total, hasMore }`. `limit` is capped at 100. |
 | `release(id: ID!)` | One release, or `null` |
 
 ### Mutations
@@ -81,6 +81,7 @@ One endpoint: **`POST /api/graphql`** (GraphQL). `GET /api/graphql` serves the G
 enum Status { planned ongoing done }
 
 type Step    { id: Int!  label: String!  completed: Boolean! }
+type ReleasePage { items: [Release!]!  total: Int!  hasMore: Boolean! }
 type Release {
   id: ID!  name: String!  dueDate: String!  additionalInfo: String
   status: Status!
@@ -95,7 +96,7 @@ Errors use GraphQL error codes `BAD_USER_INPUT` (invalid input) and `NOT_FOUND` 
 ```bash
 curl -X POST http://localhost:3000/api/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query":"{ releases { id name status steps { id label completed } } }"}'
+  -d '{"query":"{ releases(limit: 20) { items { id name status } total hasMore } }"}'
 ```
 
 ```bash

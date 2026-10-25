@@ -14,12 +14,20 @@ export const formatDate = (iso: string) =>
 
 export function ReleaseList({
   releases,
+  total,
+  hasMore,
+  loadingMore,
+  onLoadMore,
   loading,
   error,
   onView,
   onNew,
 }: {
   releases: ReleaseView[];
+  total: number;
+  hasMore: boolean;
+  loadingMore: boolean;
+  onLoadMore: () => void;
   loading: boolean;
   error?: string;
   onView: (id: string) => void;
@@ -99,6 +107,17 @@ export function ReleaseList({
           </tbody>
         </table>
       </div>
+
+      {hasMore && (
+        <div className="load-more">
+          <span className="muted">
+            Showing {releases.length} of {total}
+          </span>
+          <button className="btn" disabled={loadingMore} onClick={onLoadMore}>
+            {loadingMore ? "Loading…" : "Load more"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
