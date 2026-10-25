@@ -51,6 +51,15 @@ export const UPDATE_INFO = gql`
   ${RELEASE_FIELDS}
 `;
 
+export const UPDATE_RELEASE = gql`
+  mutation UpdateRelease($id: ID!, $name: String, $dueDate: String, $additionalInfo: String) {
+    updateRelease(id: $id, name: $name, dueDate: $dueDate, additionalInfo: $additionalInfo) {
+      ...ReleaseFields
+    }
+  }
+  ${RELEASE_FIELDS}
+`;
+
 export const DELETE_RELEASE = gql`
   mutation DeleteRelease($id: ID!) {
     deleteRelease(id: $id)

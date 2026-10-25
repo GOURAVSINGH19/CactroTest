@@ -9,7 +9,11 @@ export function Providers({ children }: { children: ReactNode }) {
     () =>
       new ApolloClient({
         link: new HttpLink({ uri: "/api/graphql" }),
-        cache: new InMemoryCache(),
+        // Step ids (1..7) repeat across releases, so steps must not be cached
+        // as shared `Step:<id>` entities; keep them embedded in their release.
+        cache: new InMemoryCache({
+          typePolicies: { Step: { keyFields: false } },
+        }),
       }),
   );
   return <ApolloProvider client={client}>{children}</ApolloProvider>;

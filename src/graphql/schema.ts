@@ -27,6 +27,12 @@ export const typeDefs = /* GraphQL */ `
 
   type Mutation {
     createRelease(name: String!, dueDate: String!, additionalInfo: String): Release!
+    updateRelease(
+      id: ID!
+      name: String
+      dueDate: String
+      additionalInfo: String
+    ): Release!
     toggleStep(releaseId: ID!, stepId: Int!, completed: Boolean!): Release!
     updateAdditionalInfo(releaseId: ID!, additionalInfo: String): Release!
     deleteRelease(id: ID!): Boolean!

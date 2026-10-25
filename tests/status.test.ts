@@ -15,6 +15,10 @@ describe("computeStatus", () => {
   it("ignores duplicates", () => {
     expect(computeStatus([1, 1, 1])).toBe("ongoing");
   });
+  it("ignores ids that are not steps (stale data)", () => {
+    const allButOne = STEPS.slice(1).map((s) => s.id);
+    expect(computeStatus([...allButOne, 8, 99])).toBe("ongoing");
+  });
 });
 
 describe("isValidStepId", () => {

@@ -44,6 +44,39 @@ export const resolvers = {
       });
     },
 
+    // Omitted fields stay unchanged; additionalInfo: null clears it.
+    updateRelease: async (
+      _: unknown,
+      args: {
+        id: string;
+        name?: string | null;
+        dueDate?: string | null;
+        additionalInfo?: string | null;
+      },
+    ) => {
+      const data: {
+        name?: string;
+        dueDate?: Date;
+        additionalInfo?: string | null;
+      } = {};
+      if (args.name != null) {
+        const name = args.name.trim();
+        if (!name) throw badInput("Name is required");
+        data.name = name;
+      }
+      if (args.dueDate != null) {
+        const dueDate = new Date(args.dueDate);
+        if (Number.isNaN(dueDate.getTime())) throw badInput("Invalid due date");
+        data.dueDate = dueDate;
+      }
+      if (args.additionalInfo !== undefined) {
+        data.additionalInfo = args.additionalInfo?.trim() || null;
+      }
+      const row = await prisma.release.findUnique({ where: { id: args.id } });
+      if (!row) throw notFound(args.id);
+      return prisma.release.update({ where: { id: args.id }, data });
+    },
+
     // Sets (not flips) the step so retries / double clicks are idempotent.
     toggleStep: async (
       _: unknown,
@@ -54,7 +87,8 @@ export const resolvers = {
         where: { id: args.releaseId },
       });
       if (!row) throw notFound(args.releaseId);
-      const set = new Set(row.completedSteps);
+      // Drop stale ids left over from an older step list while we're here.
+      const set = new Set(row.completedSteps.filter(isValidStepId));
       if (args.completed) set.add(args.stepId);
       else set.delete(args.stepId);
       return prisma.release.update({

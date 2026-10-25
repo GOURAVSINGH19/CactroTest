@@ -41,6 +41,7 @@ vi.mock("../src/lib/db", () => ({
 }));
 
 import { yoga } from "../src/graphql/yoga";
+import { STEPS } from "../src/lib/steps";
 
 // Goes through the real HTTP handler, same path as POST /api/graphql.
 async function run(query: string, variables?: Record<string, unknown>) {
@@ -78,7 +79,7 @@ describe("release API", () => {
     expect((await toggle(1, true)).data!.toggleStep).toEqual({ status: "ongoing" }); // idempotent
     expect((await toggle(1, false)).data!.toggleStep).toEqual({ status: "planned" });
 
-    for (let i = 1; i <= 8; i++) await toggle(i, true);
+    for (const s of STEPS) await toggle(s.id, true);
     const all = await run(`{ release(id: "${rel.id}") { status } }`);
     expect(all.data!.release).toEqual({ status: "done" });
 
@@ -86,6 +87,19 @@ describe("release API", () => {
       `mutation { updateAdditionalInfo(releaseId: "${rel.id}", additionalInfo: "ship it") { additionalInfo } }`,
     );
     expect(info.data!.updateAdditionalInfo).toEqual({ additionalInfo: "ship it" });
+
+    const upd = await run(
+      `mutation { updateRelease(id: "${rel.id}", name: " v1.1 ", dueDate: "2027-01-02T09:00:00Z") { name dueDate additionalInfo } }`,
+    );
+    expect(upd.data!.updateRelease).toEqual({
+      name: "v1.1",
+      dueDate: "2027-01-02T09:00:00.000Z",
+      additionalInfo: "ship it", // omitted field is untouched
+    });
+    const badName = await run(
+      `mutation { updateRelease(id: "${rel.id}", name: "  ") { id } }`,
+    );
+    expect(badName.errors?.[0].message).toBe("Name is required");
 
     const del = await run(`mutation { deleteRelease(id: "${rel.id}") }`);
     expect(del.data!.deleteRelease).toBe(true);
