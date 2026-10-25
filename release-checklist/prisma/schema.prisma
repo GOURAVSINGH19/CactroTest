@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Status is intentionally NOT stored: it is derived from completedSteps
+// (see src/lib/status.ts) so there is a single source of truth.
+model Release {
+  id             String   @id @default(uuid())
+  name           String
+  dueDate        DateTime
+  additionalInfo String?
+  completedSteps Int[]    @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([dueDate])
+}
